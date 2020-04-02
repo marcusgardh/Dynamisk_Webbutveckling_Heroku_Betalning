@@ -12,16 +12,16 @@ var verifyToken = require("./verifyToken");
 
 router.get(ROUTE.checkout, verifyToken, async function (req, res) {
     if (verifyToken) {
-        var showUserInfo = await UserModel.findOne({ _id: req.body.userInfo._id }).populate('wishlist.productId', {
+        var userInfo = await UserModel.findOne({ _id: req.body.userInfo._id }).populate('wishlist.productId', {
             artist: 1,
             album: 1,
             price: 1
         });
-        res.status(202).render(VIEW.checkout, { ROUTE: ROUTE, showUserInfo: showUserInfo, token: req.cookies.jsonwebtoken !== undefined ? true : false });
+        res.status(202).render(VIEW.checkout, { ROUTE: ROUTE, userInfo: userInfo, token: req.cookies.jsonwebtoken !== undefined ? true : false });
     } else {
         return res.status(202).render(VIEW.checkout, {
             ROUTE: ROUTE,
-            showUserInfo: "empty cart",
+            userInfo: "empty cart",
             token: req.cookies.jsonwebtoken !== undefined ? true : false
         });
     }

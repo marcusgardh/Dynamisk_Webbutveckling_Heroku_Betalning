@@ -1,25 +1,36 @@
-const express = require('express');
-const router = express.Router();
-const { ROUTE, VIEW } = require('../constant');
+const express = require('express')
+const router = express.Router()
+const { ROUTE, VIEW } = require('../constant')
+const config = require('../config/config')
 const UserModel = require("../model/user")
-const verifyToken = require("./verifyToken")
+const verifyToken = require('./verifyToken')
+const stripe = require('stripe')(config.stripe.secret_key)
 
 router.get(ROUTE.checkout, verifyToken, async (req, res) => {
-    if (verifyToken) {
-        const showUserInfo = await UserModel.findOne({ _id: req.body.userInfo._id })
-            .populate('wishlist.productId', {
-                artist: 1,
-                album: 1,
-                price: 1
-            })
-        res.status(202).render(VIEW.checkout, { ROUTE, showUserInfo, token: (req.cookies.jsonwebtoken !== undefined) ? true : false })
-    } else {
-        return res.status(202).render(VIEW.checkout, {
-            ROUTE,
-            showUserInfo: "empty cart",
-            token: (req.cookies.jsonwebtoken !== undefined) ? true : false
+    
+    const userInfo = await UserModel.findOne({ _id: req.body.userInfo._id }).populate('wishlist.productId')
+
+    console.log(userInfo)
+
+        return stripe.checkout.sessions.create({
+            payment_method_types: ["card"],
+            line_items: userInfo.wishlist.map((product)=>{
+                return {
+                    name: product.productId.album,
+                    amount:product.productId.price * 100, //öre *100 = 1 kronor
+                    quantity: 1, 
+                    currency:"sek"
+                }
+            }),
+            success_url: 'http://localhost:8080',
+            cancel_url: 'http://localhost:8080/error'
+            // ":" + process.env.PORT + 
+        
+        }).then( (session)=>{
+            console.log(session)
+            res.status(202).render(VIEW.checkout, { ROUTE, userInfo, sessionId:session.id, token: (req.cookies.jsonwebtoken !== undefined) ? true : false })
         })
-    }
+    
 })
 
 router.post(ROUTE.checkout, verifyToken, (req, res) => {

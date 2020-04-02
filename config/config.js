@@ -9,6 +9,11 @@ const spotify = {
     client_secret: process.env.SPOTIFY_CLIENT_SECRET
 }
 
+const stripe = {
+    publishable_key: process.env.STRIPE_PUBLISHABLE_KEY,
+    secret_key: process.env.STRIPE_SECRET_KEY
+}
+
 const mailkey = {
     mailkey: process.env.SEND_GRID_KEY
 }
@@ -23,4 +28,4 @@ const admin = {
 }
 
 
-module.exports = { mongoDB, spotify, mailkey, tokenkey, admin };  
+module.exports = { mongoDB, spotify, stripe, mailkey, tokenkey, admin };  

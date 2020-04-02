@@ -1,0 +1,36 @@
+<%- include ("header.ejs") %>
+<%- include ("navbar.ejs") %>
+<main>
+    <p class="small-text">
+        Ett urval av alla godbitar som finns på lager just nu.
+    </p>
+    <%- include ("pagination.ejs") %>
+    <ul class="product-list">
+        <% productList.forEach((product)=>{ %>
+        <li class="product-display">
+            <div class="product-image-container"><img src="<%= product.imgUrl %>"></div>
+            <div class="product-info-container">
+                <div class="product-info-left">
+                    <div class="product-artist"><%= product.artist %></div>
+                    <div><%= product.album %></div>
+                    <div class="product-price-container">
+                        <span class="product-price"><%= product.price %></span>
+                        <span class="product-currency">SEK</span>
+                    </div>
+                </div>
+                <div class="product-info-right">
+                    <a href="/wishlist/<%= product._id %>">
+                        <button class="add-to-cart-button">SPARA</button>
+                    </a>
+                    <a href="<%= ROUTE.gallery %>/<%= product._id%>">
+                        <button id="show-product-button">INFO</button>
+                    </a>
+                </div>
+            </div>
+        </li>
+        <div class="line"></div>
+        <% }) %>
+    </ul>
+    <%- include ("pagination.ejs") %>
+</main>
+<%- include ("footer.ejs") %>

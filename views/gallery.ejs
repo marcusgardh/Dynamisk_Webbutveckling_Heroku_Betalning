@@ -19,9 +19,8 @@
                     </div>
                 </div>
                 <div class="product-info-right">
-                    <a href="/wishlist/<%= product._id %>">
+                    <a href="<%= ROUTE.wishlist %>/<%= product._id %>">
                         <button class="add-to-cart-button">SPARA</button>
-                    </a>
                     <a href="<%= ROUTE.gallery %>/<%= product._id%>">
                         <button id="show-product-button">INFO</button>
                     </a>

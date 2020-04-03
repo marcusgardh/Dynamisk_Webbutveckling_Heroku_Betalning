@@ -53,7 +53,7 @@ router.get(ROUTE.index, async function (req, res) {
 
 router.get(ROUTE.product, async function (req, res) {
     var oneProduct = await Product.findById({ _id: req.params.id });
-    res.render(VIEW.product, { oneProduct: oneProduct, token: req.cookies.jsonwebtoken !== undefined ? true : false });
+    res.render(VIEW.product, { ROUTE: ROUTE, oneProduct: oneProduct, token: req.cookies.jsonwebtoken !== undefined ? true : false });
 });
 
 router.get(ROUTE.gallery, async function (req, res) {
@@ -82,6 +82,34 @@ router.get(ROUTE.gallery, async function (req, res) {
             }));
         });
     }
+});
+
+router.get(ROUTE.addToCart, async function (req, res) {
+    var selectedProduct = await Product.findById({ _id: req.params.id });
+    var cookie = req.cookies.shoppingcart;
+    if (cookie) {
+        console.log(cookie);
+        res.clearCookie('shoppingcart');
+        cookie.push(selectedProduct);
+        res.cookie('shoppingcart', cookie, {
+            maxAge: 3500000,
+            httpOnly: true
+        });
+        console.log('-----');
+        console.log(cookie);
+    }
+    if (!cookie) {
+        var shoppingCartArray = new Array();
+        console.log(shoppingCartArray);
+        shoppingCartArray.push(selectedProduct);
+        res.cookie('shoppingcart', shoppingCartArray, {
+            maxAge: 3500000,
+            httpOnly: true
+        });
+
+        console.log(shoppingCartArray);
+    }
+    res.redirect(ROUTE.gallery + '/' + req.params.id);
 });
 
 var validatePage = async function validatePage(query) {

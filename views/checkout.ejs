@@ -6,14 +6,14 @@
     </div>
     <div class="shoppingcart-container">
         <div class="wishlist-shoppingcart-continer">
-            <% userInfo.wishlist.forEach( (obj)=> { %>
+            <% cookie.forEach( (obj)=> { %>
             <div class="wishlist-shoppingcart-innercontiner">
                 <div class="product-img"> </div>
                 <div class="wishlist-shoppingcart-info">
-                    <div class="wishlist-shoppingcart-item ">Album: <%= obj.productId.album %> </div>
-                    <div class="wishlist-shoppingcart-item ">Artist: <%= obj.productId.artist %> </div>
-                    <div class="wishlist-shoppingcart-item ">Album ID: <%= obj.productId._id %> </div>
-                    <div class="wishlist-shoppingcart-item ">Pris: <%= obj.productId.price %> SEK</div>
+                    <div class="wishlist-shoppingcart-item ">Album: <%= obj.album %> </div>
+                    <div class="wishlist-shoppingcart-item ">Artist: <%= obj.artist %> </div>
+                    <div class="wishlist-shoppingcart-item ">Album ID: <%= obj._id %> </div>
+                    <div class="wishlist-shoppingcart-item ">Pris: <%= obj.price %> SEK</div>
                 </div>
             </div>
             <% }); %>

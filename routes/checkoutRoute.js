@@ -10,25 +10,30 @@ router.get(ROUTE.checkout, verifyToken, async (req, res) => {
     
     const userInfo = await UserModel.findOne({ _id: req.body.userInfo._id }).populate('wishlist.productId')
 
-        return await stripe.checkout.sessions.create({
-            payment_method_types: ["card"],
-            line_items: userInfo.wishlist.map((product)=>{
-                return {
-                    name: product.productId.album,
-                    amount:product.productId.price * 100, //öre *100 = 1 kronor
-                    quantity: 1, 
-                    currency:"sek"
-                }
-            }),
-            success_url: req.protocol +   "://" + req.get("Host") +  "/",
-            cancel_url: 'http://localhost:8080/error'
-            // ":" + process.env.PORT + 
-        
-        }).then( (session)=>{
-            console.log(session)
-            console.log(session.id)
-            res.status(202).render(VIEW.checkout, { ROUTE, userInfo, sessionId:session.id, token: (req.cookies.jsonwebtoken !== undefined) ? true : false })
-        })
+    const cookie = req.cookies.shoppingcart;
+
+    return await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: cookie.map((product)=>{
+            return {
+                name: product.album,
+                amount:product.price * 100, //öre *100 = 1 kronor
+                quantity: 1, 
+                currency:"sek"
+            }
+        }),
+        // customer: userInfo.firstName + " " + userInfo.lastName,
+        customer_email: userInfo.email,
+        success_url: req.protocol +   "://" + req.get("Host") +  "/",
+        cancel_url: 'http://localhost:8080/error'
+        // ":" + process.env.PORT + 
+    
+    }).then( (session)=>{
+        console.log(session)
+        console.log(session.id)
+        res.clearCookie('shoppingcart')
+        res.status(202).render(VIEW.checkout, { ROUTE, cookie, userInfo, sessionId:session.id, token: (req.cookies.jsonwebtoken !== undefined) ? true : false })
+    })
     
 })
 

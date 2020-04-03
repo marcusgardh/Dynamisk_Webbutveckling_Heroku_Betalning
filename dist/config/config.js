@@ -11,6 +11,11 @@ var spotify = {
     client_secret: process.env.SPOTIFY_CLIENT_SECRET
 };
 
+var stripe = {
+    publishable_key: process.env.STRIPE_PUBLISHABLE_KEY,
+    secret_key: process.env.STRIPE_SECRET_KEY
+};
+
 var mailkey = {
     mailkey: process.env.SEND_GRID_KEY
 };
@@ -24,4 +29,4 @@ var admin = {
     adminPassword: process.env.ADMIN_PASSWORD
 };
 
-module.exports = { mongoDB: mongoDB, spotify: spotify, mailkey: mailkey, tokenkey: tokenkey, admin: admin };
+module.exports = { mongoDB: mongoDB, spotify: spotify, stripe: stripe, mailkey: mailkey, tokenkey: tokenkey, admin: admin };

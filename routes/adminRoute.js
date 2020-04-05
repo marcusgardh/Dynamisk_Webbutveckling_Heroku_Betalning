@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const ProductModel = require('../model/product');
+const Product = require('../model/product');
 const { ROUTE, VIEW, PRODUCT } = require('../constant');
 const request = require('request');
 const config = require('../config/config');
@@ -8,7 +8,7 @@ const url = require("url");
 const verifyAdminToken = require('./verifyAdminToken');
 
 router.get(ROUTE.admin, verifyAdminToken, async (req, res) => {
-    const productList = (await (ProductModel.find().populate('user', { _id: 1 }))).reverse()
+    const productList = (await (Product.find().populate('user', { _id: 1 }))).reverse()
     res.render(VIEW.admin, {
         productList,
         ROUTE,
@@ -47,7 +47,7 @@ router.post(ROUTE.admin, verifyAdminToken, (req, res) => {
                 };
                 request.get(options, function (error, response, body) {
                     const spotifyResponse = JSON.parse(body).albums;
-                    const userInfo = req.body.userInfo;
+                    const user = req.body.user;
                     if (spotifyResponse.items == 0) {
                         res.redirect(url.format({
                             pathname: ROUTE.error,
@@ -61,7 +61,7 @@ router.post(ROUTE.admin, verifyAdminToken, (req, res) => {
                         });
                         res.render(VIEW.adminAddProduct, {
                             ROUTE,
-                            userInfo: userInfo,
+                            user: user,
                             spotifyResponse: spotifyResponse,
                             genres: genres,
                             token: (req.cookies.jsonwebtoken !== undefined) ? true : false
@@ -81,7 +81,7 @@ router.post(ROUTE.adminAddProduct, verifyAdminToken, async (req, res) => {
             genres.push(property.replace("genre", ""));
         }
     }
-    const product = await new ProductModel({
+    const product = await new Product({
         artist: req.body.artist,
         album: req.body.album,
         tracks: req.body.tracks,
@@ -90,7 +90,7 @@ router.post(ROUTE.adminAddProduct, verifyAdminToken, async (req, res) => {
         genre: genres,
         price: req.body.price,
         addedBy: req.body.adminName,
-        user: req.body.userInfo._id
+        user: req.body.user._id
     });
     product.validate(function (err) {
         if (err) {

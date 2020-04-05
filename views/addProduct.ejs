@@ -26,9 +26,9 @@
             <label for="price">Pris</label>
             <input type="number" name="price" />
             <label for="addedBy">Tillagd av</label>
-            <input type="text" name="adminName" value="<%= userInfo.email %>">
+            <input type="text" name="adminName" value="<%= user.email %>">
             <label for="adminId">Admin ID: </label>
-            <input type="text" name="adminId" value="<%= userInfo._id %>">
+            <input type="text" name="adminId" value="<%= user._id %>">
             <div class="add-album">
                 <button type="submit">Lägg till i databas</button>
             </div>

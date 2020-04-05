@@ -20,7 +20,7 @@ module.exports = function (req, res, next) {
                     }
                 }));
             } else {
-                req.body.userInfo = result.userInfo;
+                req.body.user = result.user;
                 next();
             }
         });

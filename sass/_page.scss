@@ -150,10 +150,36 @@ html {
             }
 
             //button styling  
+            .checkoutanderrorbutton {
+                @include flexColumnCenter;
+                margin-bottom: 50px;
+                margin-top: 20px;
+
+                a {
+                    text-align: center;
+
+                    button {
+                        color: $colorSecond;
+                        font-size: $textSizeStandard;
+                        background-color: $colorMain;
+                        border: 1px solid $colorSecond;
+                        align-self: center;
+                        line-height: 40px;
+                        margin: 10px;
+                        width: 40%;
+    
+                        &:hover {
+                            @include buttonHover;
+                        }
+                    }
+                }
+            }
+
             .startbuttons {
                 @include flexColumnCenter;
                 margin-bottom: 50px;
                 margin-top: 20px;
+                display: flex;
 
                 button {
                     color: $colorSecond;
@@ -276,12 +302,12 @@ html {
                 background-color: $colorSecond;
                 margin: 10px;
 
-                .wishlist-shoppingcart-continer {
+                .shoppingcart-continer {
                     @include flexColumnCenter;
                     padding-top: 1rem;
                     padding-bottom: 1rem;
 
-                    .wishlist-shoppingcart-innercontiner {
+                    .shoppingcart-innercontiner {
                         align-self: center;
                         border: $colorMain;
                         border-style: solid;
@@ -291,15 +317,21 @@ html {
                         flex-direction: row;
                         width: 70%;
 
-                        .wishlist-shoppingcart-info {
+                        .shoppingcart-info {
                             display: flex;
                             flex-direction: column;
 
-                            .wishlist-shoppingcart-item {
+                            .shoppingcart-item {
                                 margin: 7px;
                                 font-size: $textSizeSmall;
                                 display: flex;
                                 color: $colorMain;
+                                a {
+                                    color: $colorMain;
+                                }
+                                a:hover {
+                                    text-decoration: underline;
+                                }
                             }
                         }
 
@@ -416,6 +448,9 @@ html {
 
                         .wishlist-item {
                             margin: 7px;
+                            .wishlist-link:hover {
+                                text-decoration: underline;
+                            }
                         }
 
                         button {
@@ -476,7 +511,7 @@ html {
                 width: 70%;
             }
 
-            #add-to-cart-button {
+            .one-product-button {
                 @include buttonShapeMedium;
                 font-size: $textFontStandard;
                 color: $colorSecond;

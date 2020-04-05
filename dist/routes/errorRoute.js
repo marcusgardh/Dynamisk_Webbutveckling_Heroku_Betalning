@@ -7,7 +7,8 @@ var constant = require('../constant');
 router.get(constant.ROUTE.error, function (req, res) {
     res.status(404).render(constant.VIEW.error, {
         errmsg: req.query.errmsg || '404. Sidan finns inte!',
-        token: req.cookies.jsonwebtoken !== undefined ? true : false
+        token: req.cookies.jsonwebtoken !== undefined ? true : false,
+        ROUTE: constant.ROUTE
     });
 });
 

@@ -2,7 +2,7 @@
 
 var express = require('express');
 var router = express.Router();
-var ProductModel = require('../model/product');
+var Product = require('../model/product');
 
 var _require = require('../constant'),
     ROUTE = _require.ROUTE,
@@ -15,7 +15,7 @@ var url = require("url");
 var verifyAdminToken = require('./verifyAdminToken');
 
 router.get(ROUTE.admin, verifyAdminToken, async function (req, res) {
-    var productList = (await ProductModel.find().populate('user', { _id: 1 })).reverse();
+    var productList = (await Product.find().populate('user', { _id: 1 })).reverse();
     res.render(VIEW.admin, {
         productList: productList,
         ROUTE: ROUTE,
@@ -54,7 +54,7 @@ router.post(ROUTE.admin, verifyAdminToken, function (req, res) {
                 };
                 request.get(options, function (error, response, body) {
                     var spotifyResponse = JSON.parse(body).albums;
-                    var userInfo = req.body.userInfo;
+                    var user = req.body.user;
                     if (spotifyResponse.items == 0) {
                         res.redirect(url.format({
                             pathname: ROUTE.error,
@@ -68,7 +68,7 @@ router.post(ROUTE.admin, verifyAdminToken, function (req, res) {
                         });
                         res.render(VIEW.adminAddProduct, {
                             ROUTE: ROUTE,
-                            userInfo: userInfo,
+                            user: user,
                             spotifyResponse: spotifyResponse,
                             genres: genres,
                             token: req.cookies.jsonwebtoken !== undefined ? true : false
@@ -88,7 +88,7 @@ router.post(ROUTE.adminAddProduct, verifyAdminToken, async function (req, res) {
             genres.push(property.replace("genre", ""));
         }
     }
-    var product = await new ProductModel({
+    var product = await new Product({
         artist: req.body.artist,
         album: req.body.album,
         tracks: req.body.tracks,
@@ -97,7 +97,7 @@ router.post(ROUTE.adminAddProduct, verifyAdminToken, async function (req, res) {
         genre: genres,
         price: req.body.price,
         addedBy: req.body.adminName,
-        user: req.body.userInfo._id
+        user: req.body.user._id
     });
     product.validate(function (err) {
         if (err) {

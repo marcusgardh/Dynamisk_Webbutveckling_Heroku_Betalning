@@ -39,6 +39,13 @@ var schemaUser = new Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: "Product" //det som exporteras i product-model 
         }
+    }],
+    shoppingcart: [{
+        productId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Product" //det som exporteras i product-model 
+        },
+        quantity: Number
     }]
 });
 
@@ -58,6 +65,58 @@ schemaUser.methods.removeWishList = function (productId) {
         return product.productId.toString() !== productId.toString();
     });
     this.wishlist = currentProducts;
+    return this.save();
+};
+
+schemaUser.methods.addToShoppingCart = function (product) {
+
+    if (this.shoppingcart && this.shoppingcart.length > 0) {
+        console.log("if-sats");
+        for (var i = 0; i < this.shoppingcart.length; i++) {
+            console.log(this.shoppingcart[i].productId + " " + product._id);
+            console.log(this.shoppingcart[i].productId.toString() + " " + product._id.toString());
+            console.log(Boolean(this.shoppingcart[i].productId == product._id));
+            if (this.shoppingcart[i].productId.toString() == product._id.toString()) {
+                console.log("if-sats");
+                this.shoppingcart[i].quantity++;
+                return this.save();
+            }
+
+            console.log(this.shoppingcart);
+        }
+
+        console.log("else-sats");
+        this.shoppingcart.push({ productId: product._id, quantity: 1 });
+        console.log(this.shoppingcart);
+        return this.save();
+    } else {
+        console.log("else-sats");
+        this.shoppingcart.push({ productId: product._id, quantity: 1 });
+        console.log(this.shoppingcart);
+        return this.save();
+    }
+};
+
+schemaUser.methods.removeShoppingCart = function (productId) {
+    for (var i = 0; i < this.shoppingcart.length; i++) {
+        if (this.shoppingcart[i].productId._id.toString() == productId.toString()) {
+            this.shoppingcart[i].quantity--;
+
+            if (this.shoppingcart[i].quantity < 1) {
+                this.shoppingcart.splice(i, 1);
+            }
+
+            return this.save();
+        }
+    }
+};
+
+schemaUser.methods.emptyShoppingCart = function () {
+    while (this.shoppingcart.length) {
+        console.log("pop");
+        this.shoppingcart.pop();
+    }
+
     return this.save();
 };
 

@@ -2,7 +2,7 @@
 <%- include ("navbar.ejs") %>
 <main>
     <div class="pageheadline">
-        <h1>Checkout</h1>
+        <h1>Varukorg</h1>
     </div>
     <div class="shoppingcart-container">
         <div class="shoppingcart-continer">
@@ -15,6 +15,7 @@
                     <div class="shoppingcart-item ">Album ID: <%= obj.productId._id %> </div>
                     <div class="shoppingcart-item ">Pris: <%= obj.productId.price %> SEK</div>
                     <div class="shoppingcart-item ">Antal: <%= obj.quantity %></div>
+                    <div class="shoppingcart-item "><a href="<%=ROUTE.removeFromCart%><%=obj.productId._id%>">Ta bort</a></div>
                     
                 </div>
             </div>
@@ -23,18 +24,9 @@
         </div>
     </div>
     <div class="container">
-        <form class="startbuttons" method="POST">
-            <button id="buybtn" type="submit">TILL BETALNING</button>
-        </form>
-        <script src="https://js.stripe.com/v3/"></script>
-        <script>
-            const stripe = Stripe('pk_test_FvsSHpwPOD8mudVG4j9mPK3S00gDQPVwHY');
-            document.querySelector('#buybtn').addEventListener('click', () => {
-                stripe.redirectToCheckout({
-                    sessionId: '<%=sessionId%>'
-                })
-            })
-        </script>
+        <div class="checkoutanderrorbutton">
+            <a href="<%=ROUTE.checkout%>"><button>TILL CHECKOUT</button></a>
+        </div>
     </div>
 </main>
 <%- include ("footer.ejs") %>

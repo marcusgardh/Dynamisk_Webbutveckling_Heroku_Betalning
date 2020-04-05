@@ -20,8 +20,8 @@ module.exports = function (req, res, next) {
                     }
                 }));
             } else {
-                if (result.userInfo.isAdmin == true) {
-                    req.body.userInfo = result.userInfo;
+                if (result.user.isAdmin == true) {
+                    req.body.user = result.user;
                     next();
                 } else {
                     res.redirect(ROUTE.index);

@@ -59,35 +59,6 @@ router.get(ROUTE.gallery, async (req, res) => {
     }
 })
 
-router.get(ROUTE.addToCart, async (req, res) => {
-    const selectedProduct = await Product.findById({ _id: req.params.id })
-    const cookie = req.cookies.shoppingcart;
-    if (cookie) {
-        console.log(cookie)
-        res.clearCookie('shoppingcart')
-        cookie.push(selectedProduct)
-        res.cookie('shoppingcart', cookie, {
-            maxAge: 3500000,
-            httpOnly: true
-        })
-        console.log('-----')
-        console.log(cookie)
-    }
-    if (!cookie) {
-        const shoppingCartArray = new Array()
-        console.log(shoppingCartArray)
-        shoppingCartArray.push(selectedProduct)
-        res.cookie('shoppingcart', shoppingCartArray, {
-            maxAge: 3500000,
-            httpOnly: true
-        })
-        
-        console.log(shoppingCartArray)
-    }
-    res.redirect(`${ROUTE.gallery}/${req.params.id}`)
-    
-})
-
 const validatePage = async (query) => {
     return new Promise(async (resolve, reject) => {
         if (Number.isInteger(+query.page)) {

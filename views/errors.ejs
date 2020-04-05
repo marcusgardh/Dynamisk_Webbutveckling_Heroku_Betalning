@@ -6,14 +6,14 @@
             <h2 class="my-3"><%= errmsg %></h2>
         </div>
 
-        <form class="startbuttons" method="get">
-            <button type="submit" formaction="/">HEM</button>
-            <button type="submit" formaction="gallery">WEBSHOP</button>
-            <button type="submit" formaction="useraccount">MIN PROFIL</button>
-            <button type="submit" formaction="login">LOGGA IN</button>
-            <button type="submit" formaction="createuser">BLI MEDLEM</button>
-            <button type="submit" formaction="admin">ADMIN</button>
-        </form>
+        <div class="checkoutanderrorbutton">
+            <a href="<%=ROUTE.index%>"><button>HEM</button></a>
+            <a href="<%=ROUTE.gallery%>"><button>WEBSHOP</button></a>
+            <a href="<%=ROUTE.userAccount%>"><button>MIN PROFIL</button></a>
+            <a href="<%=ROUTE.login%>"><button>LOGGA IN</button></a>
+            <a href="<%=ROUTE.createuser%>"><button>BLI MEDLEM</button></a>
+            <a href="<%=ROUTE.admin%>"><button>ADMIN</button></a>
+        </div>
     </div>
 </main>
 <%- include ("footer.ejs") %>

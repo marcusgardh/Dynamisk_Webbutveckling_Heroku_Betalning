@@ -3,7 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const crypto = require("crypto");
 const UserInfoModel = require('../model/user');
-const ProductModel = require("../model/product");
+const Product = require("../model/product");
 const config = require('../config/config');
 const {
     ROUTE,
@@ -57,23 +57,23 @@ router.post(ROUTE.createUser, async (req, res) => {
             }));
         }
     }
-        const userInfo = await UserInfoModel.findOne({
+        const user = await UserInfoModel.findOne({
             email: req.body.email
         });
-        if (!userInfo) return res.redirect(url.format({
+        if (!user) return res.redirect(url.format({
             pathname: ROUTE.error,
             query: {
                 errmsg: 'Fel email!'
             }
         }));
-        const validUser = await bcrypt.compare(req.body.password, userInfo.password);
+        const validUser = await bcrypt.compare(req.body.password, user.password);
         if (!validUser) return res.render("errors", {
             errmsg: 'Fel lösenord!',
             token: (req.cookies.jsonwebtoken !== undefined) ? true : false
         });
-        const tokenSignature = userInfo.isAdmin ? config.tokenkey.adminjwt : config.tokenkey.userjwt;
+        const tokenSignature = user.isAdmin ? config.tokenkey.adminjwt : config.tokenkey.userjwt;
         jwt.sign({
-            userInfo
+            user
         }, tokenSignature, (err, token) => {
             if (err) return res.render('errors', {
                 errmsg: 'token funkar inte',
@@ -101,17 +101,17 @@ router.get(ROUTE.login, async (req, res) => {
 })
 
 router.post(ROUTE.login, async (req, res) => {
-    const userInfo = await UserInfoModel.findOne({
+    const user = await UserInfoModel.findOne({
         email: req.body.email
     });
-    if (!userInfo) return res.redirect(url.format({
+    if (!user) return res.redirect(url.format({
         pathname: ROUTE.error,
         query: {
             errmsg: 'Fel email!'
         }
     }));
 
-    const validUser = await bcrypt.compare(req.body.password, userInfo.password);
+    const validUser = await bcrypt.compare(req.body.password, user.password);
     if (!validUser) return res.redirect(url.format({
         pathname: ROUTE.error,
         query: {
@@ -119,9 +119,9 @@ router.post(ROUTE.login, async (req, res) => {
         }
     }));
     else {
-        const tokenSignature = userInfo.isAdmin ? config.tokenkey.adminjwt : config.tokenkey.userjwt;
+        const tokenSignature = user.isAdmin ? config.tokenkey.adminjwt : config.tokenkey.userjwt;
         jwt.sign({
-            userInfo
+            user
         }, tokenSignature, (err, token) => {
             if (err) return res.redirect(url.format({
                 pathname: ROUTE.error,
@@ -137,7 +137,7 @@ router.post(ROUTE.login, async (req, res) => {
                         httpOnly: true
                     })
                 }
-                if (userInfo.isAdmin) {
+                if (user.isAdmin) {
                     res.redirect(ROUTE.admin);
                 } else {
                     res.redirect(ROUTE.userAccount);
@@ -148,9 +148,9 @@ router.post(ROUTE.login, async (req, res) => {
 });
 
 router.get(ROUTE.userAccount, verifyToken, async (req, res) => {
-    const loggedIn = jwt.decode(req.cookies.jsonwebtoken).userInfo;
+    const loggedIn = jwt.decode(req.cookies.jsonwebtoken).user;
     const user = await UserInfoModel.findOne({
-        _id: req.body.userInfo._id
+        _id: req.body.user._id
     }).populate('wishlist.productId', {
         artist: 1,
         album: 1,
@@ -170,7 +170,7 @@ router.get(ROUTE.userAccount, verifyToken, async (req, res) => {
 })
 
 router.post(ROUTE.userAccount, async (req, res) => {
-    const loggedIn = jwt.decode(req.cookies.jsonwebtoken).userInfo;
+    const loggedIn = jwt.decode(req.cookies.jsonwebtoken).user;
     if (await bcrypt.compare(req.body.currentpassword, loggedIn.password)) {
         const salt = await bcrypt.genSalt(10);
         const newHashPassword = await bcrypt.hash(req.body.newpassword, salt)
@@ -209,13 +209,49 @@ router.post(ROUTE.userAccount, async (req, res) => {
     }
 })
 
-router.get(ROUTE.wishlistId, verifyToken, async (req, res) => {
+router.get(ROUTE.addToCart + ':id', verifyToken, async (req, res) => {
     if (verifyToken) {
-        const product = await ProductModel.findOne({
+        const product = await Product.findOne({
             _id: req.params.id
         });
         const user = await UserInfoModel.findOne({
-            _id: req.body.userInfo._id
+            _id: req.body.user._id
+        });
+        user.addToShoppingCart(product);
+        return res.redirect('back');
+    } else {
+        res.redirect(url.format({
+            pathname: ROUTE.error,
+            query: {
+                errmsg: 'Du måste logga in för att lägga till produkten i din varukorg!'
+            }
+        }));
+    }
+})
+
+router.get(ROUTE.removeFromCart + ':id', verifyToken, async (req, res) => {
+    const user = await UserInfoModel.findOne({
+        _id: req.body.user._id
+    });
+    user.removeShoppingCart(req.params.id)
+    res.redirect(ROUTE.cart);
+})
+
+router.get(ROUTE.wishlistRemoveId, verifyToken, async (req, res) => {
+    const user = await UserInfoModel.findOne({
+        _id: req.body.user._id
+    });
+    user.removeWishList(req.params.id)
+    res.redirect(ROUTE.userAccount);
+})
+
+router.get(ROUTE.wishlistId, verifyToken, async (req, res) => {
+    if (verifyToken) {
+        const product = await Product.findOne({
+            _id: req.params.id
+        });
+        const user = await UserInfoModel.findOne({
+            _id: req.body.user._id
         });
         user.addToWishlist(product);
         return res.redirect(ROUTE.userAccount);
@@ -231,7 +267,7 @@ router.get(ROUTE.wishlistId, verifyToken, async (req, res) => {
 
 router.get(ROUTE.wishlistRemoveId, verifyToken, async (req, res) => {
     const user = await UserInfoModel.findOne({
-        _id: req.body.userInfo._id
+        _id: req.body.user._id
     });
     user.removeWishList(req.params.id)
     res.redirect(ROUTE.userAccount);
